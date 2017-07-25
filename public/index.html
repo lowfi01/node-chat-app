@@ -7,5 +7,25 @@
 
     <body>
         <p>Welcome to the chat app</p>
+
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            // io() - makes request from client to server, to open socketio & keep connection open
+            // we will be using var socket - to send & receive data
+            var socket = io();     
+            
+            // connect event for client
+            // event fires when - connected to server
+            socket.on('connect', () => {
+                // note we do not get access to a call back event - because we already have it, it's the socket variable
+                console.log('connected to server');
+            });
+
+            // disconnect even for client
+            // event fires when - disconnected from server
+            socket.on('disconnect', () => {
+                console.log('disconnected from server');
+            });
+        </script>
     </body>
 </html>

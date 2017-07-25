@@ -23,10 +23,27 @@ io.on('connection', (socket) => {
     // note - that the connection event is persistent, between - client & server
     console.log('New user connected');
    
+
+    //emitter
+    socket.emit('newMessage', {
+        // note - emitter send, listener receives
+        from: 'james@example.com',
+        text: "Hey. Whats is going on?",
+        createdAt: 123
+    });
+
+    //listener
+    socket.on('createMessage', (message) => {
+        // note - listener waits for emitter to trigger & then receives data
+        console.log('createMessage', message);
+    });
+
+
+
     // this will trigger - when a browser tab that has a live connect is closed
     socket.on('disconnect', () => {
-                console.log('disconnected from client');
-            });
+        console.log('disconnected from client');
+    });
 });
 
 
@@ -35,3 +52,20 @@ server.listen(port, () => {
     console.log(`server is live on ${port}`);
 });
 
+/// old code - email emitter & listener examples
+
+    // // custom emitter
+    // // argument (nameOfEvent, {specify the data here})
+    // socket.emit('newEmail', {
+    //     // custom data here
+    //     from: 'mike@example.com',
+    //     text: "hey what's cracking",
+    //     createdAt: 123
+
+    // });
+
+    // // custom event listener
+    // // argument (nameOfEventToListenTo, function (dataReturnedWhenEventTriggers) {do something with data})
+    // socket.on('createEmail', (data) => {
+    //     console.log('createEmail', data);
+    // })

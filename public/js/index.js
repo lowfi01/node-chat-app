@@ -4,12 +4,12 @@
 // io() - opens connection
 var socket = io();     
 
-// connect event for client
+// connect event for client to server
 socket.on('connect', function () {
     console.log('connected to server');
 });
 
-// disconnect even for client
+// disconnect even for client to server
 socket.on('disconnect', function () {
     console.log('disconnected from server');
 });

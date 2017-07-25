@@ -1,4 +1,4 @@
-// inbuilt node module - does not require installation 
+// path - inbuilt node module - does not require installation
 const path = require('path');
 const http = require('http');
 const express = require('express');
@@ -16,17 +16,23 @@ var io = socketIO(server);
 // express middleware - making /public viewable to express to serve-up
 app.use(express.static(publicPath));
 
-// register a event listener
-// connection - listens for a new connection
+//  #register instance of event listener  - io.on('connection', callBack)
+//  #connection - listens for a new connection  
+//  #Note - that the connection event is persistent, between - client & server
 io.on('connection', (socket) => {
-    //call back is a socket
-    // note - that the connection event is persistent, between - client & server
+    // - Returns socket, which we can manipulate
+    
+    // note - on connection to client this message will print to console
     console.log('New user connected');
+
+    //#  We can create Custom emitters & listeners or use default listeners, connection, connected, disconnected
+    //#  Note - server & client are required for this operation to work & the socket.io - makes this connection
+    //#  emitter  - are used to send data to listener
+    //#  listeners - are used to receive data from emitter & then do something to data
    
 
     //emitter
     socket.emit('newMessage', {
-        // note - emitter send, listener receives
         from: 'james@example.com',
         text: "Hey. Whats is going on?",
         createdAt: 123
@@ -34,23 +40,20 @@ io.on('connection', (socket) => {
 
     //listener
     socket.on('createMessage', (message) => {
-        // note - listener waits for emitter to trigger & then receives data
         console.log('createMessage', message);
     });
 
-
-
-    // this will trigger - when a browser tab that has a live connect is closed
+    // disconnect even for server to client(browser or tabs)
     socket.on('disconnect', () => {
         console.log('disconnected from client');
     });
 });
 
-
-
+// socketIo integrated with express
 server.listen(port, () => {
     console.log(`server is live on ${port}`);
 });
+
 
 /// old code - email emitter & listener examples
 

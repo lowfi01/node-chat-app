@@ -17,7 +17,7 @@ socket.on('disconnect', function () {
 
 //listener - #listens for newMessage emitter events
 socket.on('newMessage', function (message){
-    // note - listener listens & receives 
+    // - this will receive all newMessage data & then print to console(viewable on browser)
     console.log('newMessage', message);
 });
 

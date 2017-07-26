@@ -21,6 +21,15 @@ socket.on('newMessage', function (message){
     console.log('newMessage', message);
 });
 
+//create emitter #acknowledgement event
+    //#acknowledgement event, - 3rd argument a callback function
+socket.emit('createMessage', {
+    from: 'Frank',
+    text: 'Hi'
+}, function(data) {
+    console.log('got it!:  ', data);
+});
+
 
 
 

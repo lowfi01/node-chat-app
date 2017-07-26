@@ -44,14 +44,16 @@ io.on('connection', (socket) => { // - Returns socket, which we can manipulate
         // viewable to everyone but the client who has just opened a new connection
     socket.broadcast.emit('newMessage', generateMessage('Admin', 'New user joined'));
     
-            
-        //# note - in this code, we catch event from client & then resend the retrieved data(message) to all clients
-    socket.on('createMessage', (message) => { 
+      //# note - in this code, we catch event from client & then resend the retrieved data(message) to all clients
+        //#acknowledgment - add second argument callback
+    socket.on('createMessage', (message, callback) => { 
         console.log('createMessage', message);
         //broadcast to all
         io.emit('newMessage', generateMessage(message.from, message.text));
-        
-    });
+        // this will return the event to the emitter (in this case the client)
+        callback('this is from the server');
+    });        
+      
 
     // disconnect even for server to client(browser or tabs)
     socket.on('disconnect', () => {
@@ -65,7 +67,14 @@ server.listen(port, () => {
 });
 
 
-
+/// old code - reformated listener to use acknowledgements #lecture 111
+    //   //# note - in this code, we catch event from client & then resend the retrieved data(message) to all clients
+    //     socket.on('createMessage', (message) => { 
+    //         console.log('createMessage', message);
+    //         //broadcast to all
+    //         io.emit('newMessage', generateMessage(message.from, message.text));
+            
+    //     });
 /// old code - reformated emitters to take message object #lecture 110
     //     //challenge #create emitter 
     //     // from admin, text - welcome to chat application

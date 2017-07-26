@@ -6,6 +6,7 @@ const socketIO = require('socket.io');
 
 // using path - to make routing to path easier
 const publicPath = path.join(__dirname, '../public');
+// heroku requirement
 const port = process.env.PORT || 3000;
 var app = express();
 
@@ -16,12 +17,12 @@ var io = socketIO(server);
 // express middleware - making /public viewable to express to serve-up
 app.use(express.static(publicPath));
 
+
 //  #register instance of event listener  - io.on('connection', callBack)
-//  #connection - listens for a new connection  
-//  #Note - that the connection event is persistent, between - client & server
-io.on('connection', (socket) => {
-    // - Returns socket, which we can manipulate
-    
+    //  #connection - listens for a new connection  
+    //  #Note - that the connection event is persistent, between - client & server
+io.on('connection', (socket) => { // - Returns socket, which we can manipulate
+        
     // note - on connection to client this message will print to console
     console.log('New user connected');
 
@@ -31,16 +32,18 @@ io.on('connection', (socket) => {
     //#  listeners - are used to receive data from emitter & then do something to data
    
 
-    //emitter
-    socket.emit('newMessage', {
-        from: 'james@example.com',
-        text: "Hey. Whats is going on?",
-        createdAt: 123
-    });
 
-    //listener
-    socket.on('createMessage', (message) => {
-        console.log('createMessage', message);
+    //listener - #listens for createMessage events (note - we are sending the emitter via the browser, forms or console)
+    //# note - in this code, we catch event from client & then resend the retrieved data(message) to all clients
+    socket.on('createMessage', (message) => { 
+        // catch incoming emitter from client & then retrieve data then
+        // create a broadcast event to every connected client
+        // io.emit('eventName', { //dataToSend })
+        io.emit('newMessage', {
+            from: message.from,
+            text: message.text,
+            createdAt: new Date().getTime()
+        } );
     });
 
     // disconnect even for server to client(browser or tabs)
@@ -55,7 +58,15 @@ server.listen(port, () => {
 });
 
 
-/// old code - email emitter & listener examples
+/// old code - removed emitter, reference the comments in serer.js #lecture 109
+        // //emitter
+    // socket.emit('newMessage', {
+    //     from: 'james@example.com',
+    //     text: "Hey. Whats is going on?",
+    //     createdAt: 123
+    // });
+
+/// old code - email emitter & listener examples + comments #lecture 108
 
     // // custom emitter
     // // argument (nameOfEvent, {specify the data here})

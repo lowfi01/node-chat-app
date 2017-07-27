@@ -5,7 +5,7 @@ const express = require('express');
 const socketIO = require('socket.io');
 
 
-const {generateMessage} = require('./utils/message');
+const {generateMessage, generateLocationMessage} = require('./utils/message');
 // using path - to make routing to path easier
 const publicPath = path.join(__dirname, '../public');
 // heroku requirement
@@ -55,7 +55,11 @@ io.on('connection', (socket) => { // - Returns socket, which we can manipulate
         callback('this is from the server');
     });  
 
-
+    // listen for createLocationMessage event & broadcast to all
+        // pass through generateMessageObject
+    socket.on('createLocationMessage', (coordinates) => {
+        io.emit('newLocationMessage', generateLocationMessage('Admin', coordinates.latitude, coordinates.longitude))
+    });
 
     // disconnect even for server to client(browser or tabs)
     socket.on('disconnect', () => {
@@ -69,7 +73,7 @@ server.listen(port, () => {
 });
 
 
-    
+/// old code - reformat listener to emit newLocationMessage rather then message #lecture 114
 /// old code - reformated listener to use acknowledgements #lecture 111
     //   //# note - in this code, we catch event from client & then resend the retrieved data(message) to all clients
     //     socket.on('createMessage', (message) => { 

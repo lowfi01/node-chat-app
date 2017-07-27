@@ -14,6 +14,24 @@ socket.on('disconnect', function () {
     console.log('disconnected from server');
 });
 
+// listener - geolocation event
+socket.on('newLocationMessage', function (location) {
+    var li = jQuery('<li></li>');
+    // when you set anchor tag(<a>) - target="_blank", browser will create a new tab 
+    var a = jQuery('<a target="_blank">My current location</a>')
+    // set text in li 
+    li.text(`${location.from}:`);
+    // set attributes of a tags
+        // set href - to url 
+    a.attr('href', location.url)
+
+    // append anchor tag (note - anchor tag normally sits within other tags)
+    li.append(a);
+    console.log(`this is the anchor tag: ${li}` );
+    
+    // 
+    jQuery('#messages').append(li);
+});
 
 // Listener - will catch the broadcasted massage from server & render it to client using jQuery - 3rd stage in process
 socket.on('newMessage', (message, callback) => { 
@@ -26,7 +44,6 @@ socket.on('newMessage', (message, callback) => {
         // append - li variable to the DOM (add to last child (last place))
     jQuery('#messages').append(li);
 });       
-
 
 
 // jQuery event - on Submit from button - will return function - e
@@ -46,6 +63,36 @@ jQuery('#message-form').on('submit', function (e) {
         console.log('got Message from form');
     });
 });
+
+
+// store jQuery query to variable
+    //jQuery('#send-location').on(); #note - code is the same as storing to variable
+var locationButton = jQuery('#send-location');
+//button click listener (geolocation)
+locationButton.on('click', function(e) {
+    //user does not have access to GEOLOCATION api
+        // if no geoObject 
+    if (!navigator.geolocation) {
+        // - create alert function on browser ( option to select ok )
+            // note - bootstrap or foundation emotes will work in-place of this
+        return alert('Geolocation not support by your browser.');
+    }
+
+    //geolocation api call - returns location
+    navigator.geolocation.getCurrentPosition(function(position) { //position return object with data - we will grab the lat & long - then emit to all users
+        socket.emit('createLocationMessage', {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+
+           
+        });
+        
+    }, function (e) {
+        // error handling
+        console.log(e);
+        alert('Unable to fetch location');
+    });
+})
 
 
 /// old code - changed newMessage listener to push message data to be rendered to the screen #lecture 112

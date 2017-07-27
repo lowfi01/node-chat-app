@@ -44,7 +44,8 @@ io.on('connection', (socket) => { // - Returns socket, which we can manipulate
         // viewable to everyone but the client who has just opened a new connection
     socket.broadcast.emit('newMessage', generateMessage('Admin', 'New user joined'));
     
-      //# note - in this code, we catch event from client & then resend the retrieved data(message) to all clients
+    
+    //# note - this will catch the message send from the form data & emit it to everyone - second Stage in process
         //#acknowledgment - add second argument callback
     socket.on('createMessage', (message, callback) => { 
         console.log('createMessage', message);
@@ -52,8 +53,9 @@ io.on('connection', (socket) => { // - Returns socket, which we can manipulate
         io.emit('newMessage', generateMessage(message.from, message.text));
         // this will return the event to the emitter (in this case the client)
         callback('this is from the server');
-    });        
-      
+    });  
+
+
 
     // disconnect even for server to client(browser or tabs)
     socket.on('disconnect', () => {
@@ -67,6 +69,7 @@ server.listen(port, () => {
 });
 
 
+    
 /// old code - reformated listener to use acknowledgements #lecture 111
     //   //# note - in this code, we catch event from client & then resend the retrieved data(message) to all clients
     //     socket.on('createMessage', (message) => { 

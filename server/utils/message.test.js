@@ -19,8 +19,8 @@ describe('generateMessage', () => {
                     from: message.from, 
                     text: message.text
                 });         
-    })
-})
+    });
+});
 
 describe('generateLocationMessage', () => {
 
@@ -36,7 +36,7 @@ describe('generateLocationMessage', () => {
         expect(location).toInclude({
             from: 'james',
             url: `https://www.google.com.au/maps?q=1,2`
-        })
+        });
 
-    })
-} )
+    });
+} );

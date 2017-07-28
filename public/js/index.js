@@ -17,12 +17,12 @@ socket.on('disconnect', function () {
 // listener - geolocation event
 socket.on('newLocationMessage', function (location) {
     var li = jQuery('<li></li>');
-    // when you set anchor tag(<a>) - target="_blank", browser will create a new tab 
+        // when you set anchor tag(<a>) - target="_blank", browser will create a new tab 
     var a = jQuery('<a target="_blank">My current location</a>')
-    // set text in li 
+        // set text in li 
     li.text(`${location.from}:`);
-    // set attributes of a tags
-        // set href - to url 
+        // set attributes of a tags
+            // set href - to url 
     a.attr('href', location.url)
 
     // append anchor tag (note - anchor tag normally sits within other tags)
@@ -49,18 +49,21 @@ socket.on('newMessage', (message, callback) => {
 // jQuery event - on Submit from button - will return function - e
     // first stage in process - client will create a message (emitter) & send to server, server will broadcast & then client will listen & render to screen at stage 3
 jQuery('#message-form').on('submit', function (e) {
-    // manipulate e - to prevent default behavior
+        // manipulate e - to prevent default behavior
     e.preventDefault();
 
-    // emit createMessage event with the data send from the form
+        // note - [name=value] - this is a method to select name attributes from html
+    var messageTextBox = jQuery('[name=message]')
+
+        // emit createMessage event with the data send from the form
     socket.emit('createMessage', {
         from: 'User',
-        // use selector to grab text field from forms
-            // note - [name=value] - with will select name attributes = to message
-        text: jQuery('[name=message]').val()
-    }, function (data) {
-        // callBack to acknowledgement
-        console.log('got Message from form');
+            // use selector to grab text field from forms
+        text: messageTextBox.val()
+    }, function (data) {// callBack to acknowledgement
+            // select text box via name attribute & clear the text with empty string
+                // #note - this is a callback acknowledgement, as it is post the emit request, we can clear the text field after submit button has been called  
+        messageTextBox.val(' ');
     });
 });
 
@@ -70,31 +73,86 @@ jQuery('#message-form').on('submit', function (e) {
 var locationButton = jQuery('#send-location');
 //button click listener (geolocation)
 locationButton.on('click', function(e) {
-    //user does not have access to GEOLOCATION api
-        // if no geoObject 
+        //user does not have access to GEOLOCATION api
+            // if no geoObject 
     if (!navigator.geolocation) {
-        // - create alert function on browser ( option to select ok )
-            // note - bootstrap or foundation emotes will work in-place of this
+            // - create alert function on browser ( option to select ok )
+                // note - bootstrap or foundation emotes will work in-place of this
         return alert('Geolocation not support by your browser.');
     }
+    
+        //disable the button - to prevent spamming & re-enable post success of url
+    locationButton.attr('disabled', true).text('Sending location......');
 
     //geolocation api call - returns location
     navigator.geolocation.getCurrentPosition(function(position) { //position return object with data - we will grab the lat & long - then emit to all users
+             //note - success case of api call 
+        locationButton.removeAttr('disabled').text('Send location');
         socket.emit('createLocationMessage', {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude
-
-           
+            
+        }, function (e) { //acknowledgement callback
+            
         });
         
     }, function (e) {
-        // error handling
+            // error handling
         console.log(e);
+        locationButton.removeAttr('disabled').text('Send location');
         alert('Unable to fetch location');
     });
 })
 
 
+/// old code - changed both jQuery requests to allow for removing text from text - disabling send location to prevent spam #lecture115
+  //// jQuery event - on Submit from button - will return function - e
+    // first stage in process - client will create a message (emitter) & send to server, server will broadcast & then client will listen & render to screen at stage 3
+    // jQuery('#message-form').on('submit', function (e) {
+    //         // manipulate e - to prevent default behavior
+    //     e.preventDefault();
+
+    //         // emit createMessage event with the data send from the form
+    //     socket.emit('createMessage', {
+    //         from: 'User',
+    //         // use selector to grab text field from forms
+    //             // note - [name=value] - with will select name attributes = to message
+    //         text: jQuery('[name=message]').val()
+    //     }, function (data) {
+    //         // callBack to acknowledgement
+    //         console.log('got Message from form');
+    //     });
+    // });
+
+
+    // // store jQuery query to variable
+    //     //jQuery('#send-location').on(); #note - code is the same as storing to variable
+    // var locationButton = jQuery('#send-location');
+    // //button click listener (geolocation)
+    // locationButton.on('click', function(e) {
+    //         //user does not have access to GEOLOCATION api
+    //             // if no geoObject 
+    //     if (!navigator.geolocation) {
+    //             // - create alert function on browser ( option to select ok )
+    //                 // note - bootstrap or foundation emotes will work in-place of this
+    //         return alert('Geolocation not support by your browser.');
+    //     }
+
+    //     //geolocation api call - returns location
+    //     navigator.geolocation.getCurrentPosition(function(position) { //position return object with data - we will grab the lat & long - then emit to all users
+    //         socket.emit('createLocationMessage', {
+    //             latitude: position.coords.latitude,
+    //             longitude: position.coords.longitude
+
+            
+    //         });
+            
+    //     }, function (e) {
+    //             // error handling
+    //         console.log(e);
+    //         alert('Unable to fetch location');
+    //     });
+    // })
 /// old code - changed newMessage listener to push message data to be rendered to the screen #lecture 112
     // //listener - #listens for newMessage emitter events
     // socket.on('newMessage', function (message){

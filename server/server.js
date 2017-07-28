@@ -12,11 +12,11 @@ const publicPath = path.join(__dirname, '../public');
 const port = process.env.PORT || 3000;
 var app = express();
 
-// Make express work with http module
+    // Make express work with http module
 var server = http.createServer(app)
-// we pass the server we want to use with our web socket (note -server.listen & http.createServer)
+    // we pass the server we want to use with our web socket (note -server.listen & http.createServer)
 var io = socketIO(server);
-// express middleware - making /public viewable to express to serve-up
+    // express middleware - making /public viewable to express to serve-up
 app.use(express.static(publicPath));
 
 
@@ -25,7 +25,7 @@ app.use(express.static(publicPath));
     //  #Note - that the connection event is persistent, between - client & server
 io.on('connection', (socket) => { // - Returns socket, which we can manipulate
         
-    // On connection to client this message will print to console
+        // On connection to client this message will print to console
     console.log('New user connected');
 
             
@@ -49,10 +49,10 @@ io.on('connection', (socket) => { // - Returns socket, which we can manipulate
         //#acknowledgment - add second argument callback
     socket.on('createMessage', (message, callback) => { 
         console.log('createMessage', message);
-        //broadcast to all
+            //broadcast to all
         io.emit('newMessage', generateMessage(message.from, message.text));
-        // this will return the event to the emitter (in this case the client)
-        callback('this is from the server');
+            // this will return the event to the emitter (in this case the client)
+        callback('');
     });  
 
     // listen for createLocationMessage event & broadcast to all

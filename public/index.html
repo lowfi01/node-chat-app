@@ -2,22 +2,33 @@
 
 <html>
     <head>
-        <meta chatset="utf8">
+        <meta chatset="utf8"> <!--  -->
+        <link rel="stylesheet" href="/css/styles.css"> <!-- css reference link -->
     </head>
 
-    <body>
-        <p>Welcome to the chat app</p>
+    <body class="chat"> <!-- css main chat - manipulated via css  -->
+
+        <div class="chat__sidebar">
+            <h3>People</h3>  <!-- title of side bar -->
+            <div id="users">"Users"</div> <!-- house users -->
+        </div> <!-- sidebar - manipulated via css -->
 
 
-        <ol id="messages"></ol>
+        <div class="chat__main">
+                <ol id="messages" class="chat__messages"></ol> <!-- unordered lists that house messages -->
 
-        <form id="message-form"> 
-                     
-            <input name="message" type="text" placeholder="Message"/> 
-            <button>Send</button>
-        </form>
+                    <div class="chat__footer">
+                        <form id="message-form"> 
+                            <input name="message" type="text" placeholder="Message" autofocus autocomplete="off"/> <!-- text input  -->
+                            <button>Send</button> <!-- send messsage button -->
+                        </form> 
 
-        <button id="send-location">Send Location</button>
+                        <button id="send-location">Send location</button> <!-- send location button -->
+                    </div>   <!-- forms & buttons #mainly used for ailment  -->
+
+              
+        </div> <!-- messasges, unorderd list, forms & buttons -->
+        
 
         <script src="/socket.io/socket.io.js">//socketIo Javascript library (io())</script>
         <script src="/js/libs/jquery-3.2.1.min.js"></script>

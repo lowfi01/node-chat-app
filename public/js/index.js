@@ -16,11 +16,12 @@ socket.on('disconnect', function () {
 
 // listener - geolocation event
 socket.on('newLocationMessage', function (location) {
+    var formattedTime = moment(location.createAt).format('h:mm a');
     var li = jQuery('<li></li>');
         // when you set anchor tag(<a>) - target="_blank", browser will create a new tab 
     var a = jQuery('<a target="_blank">My current location</a>')
         // set text in li 
-    li.text(`${location.from}:`);
+    li.text(`${location.from} ${formattedTime}: `);
         // set attributes of a tags
             // set href - to url 
     a.attr('href', location.url)
@@ -35,11 +36,12 @@ socket.on('newLocationMessage', function (location) {
 
 // Listener - will catch the broadcasted massage from server & render it to client using jQuery - 3rd stage in process
 socket.on('newMessage', (message, callback) => { 
+    var formattedTime = moment(message.createAt).format('h:mm a');
     console.log('newMessage', message);
         // use jQuery to create lists element
     var li = jQuery('<li></li>');
         // set li text
-    li.text(`${message.from}: ${message.text}`);
+    li.text(` ${message.from} ${formattedTime}: ${message.text}`);
     
         // append - li variable to the DOM (add to last child (last place))
     jQuery('#messages').append(li);

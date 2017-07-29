@@ -4,6 +4,25 @@
 // io() - opens connection  #Access given by SocketIO javascript library <script injection>
 var socket = io();     
 
+// scrolling
+function scrollToBottom() {
+    //Selectors
+    var messages = jQuery('#messages'); //select all elements with id = #messages
+    var newMessage = messages.children('li:last-child'); // select the li items, that are the last child(last item)
+    //Heights
+    var clientHeight = messages.prop('clientHeight'); //cross browser way to select property
+    var scrollTop = messages.prop('scrollTop');
+    var scrollHeight = messages.prop('scrollHeight');
+    var newMessageHeight = newMessage.innerHeight(); // calculate the height of the last message
+    var lastMessageHeight = newMessage.prev().innerHeight(); // prev() = move to previous child // calculate the height of the second last item
+
+    // all other heights >= scrollHeight
+    if (clientHeight + scrollTop + newMessageHeight + lastMessageHeight >= scrollHeight) {
+        //jQuery method to set the scrollTop value = to scrollHeight
+        messages.scrollTop(scrollHeight);
+    };
+};
+
 // connect event for client to server
 socket.on('connect', function () {
     console.log('connected to server');
@@ -25,6 +44,7 @@ socket.on('newLocationMessage', function (location) {
     });
 
     jQuery('#messages').append(html);
+    scrollToBottom();
 });
 
 // Listener - will catch the broadcasted massage from server & render it to client using mustache - 3rd stage in process
@@ -40,6 +60,7 @@ socket.on('newMessage', function (message) {
     });
 
     jQuery('#messages').append(html);
+    scrollToBottom();
 });       
 
 

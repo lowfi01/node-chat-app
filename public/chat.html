@@ -1,0 +1,72 @@
+<!DOCTYPE>
+
+<html>
+    <head>
+        <meta chatset="utf8"> <!--  -->
+        <title>Chat | ChatApp</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no"> <!-- set viewport (to allow for mobile views) + all viewport options -->
+        <link rel="stylesheet" href="/css/styles.css"> <!-- css reference link -->
+    </head>
+
+    <body class="chat"> <!-- css main chat - manipulated via css  -->
+
+        <div class="chat__sidebar">
+            <h3>People</h3>  <!-- title of side bar -->
+            <div id="users">"Users"</div> <!-- house users -->
+        </div> <!-- sidebar - manipulated via css -->
+
+
+        <div class="chat__main">
+                <ol id="messages" class="chat__messages"></ol> <!-- unordered lists that house messages -->
+
+                    <div class="chat__footer">
+                        <form id="message-form"> 
+                            <input name="message" type="text" placeholder="Message" autofocus autocomplete="off"/> <!-- text input  -->
+                            <button>Send</button> <!-- send messsage button -->
+                        </form> 
+
+                        <button id="send-location">Send location</button> <!-- send location button -->
+                    </div>   <!-- forms & buttons #mainly used for ailment  -->
+
+              
+        </div> <!-- messasges, unorderd list, forms & buttons -->
+        
+        <script id="message-template" type="text/template">
+            <li class="message">
+
+                <div class="message__title">
+                    <h4>{{from}}</h4>
+                    <span>{{createAt}}</span>
+                </div>
+
+                <div class="message__body">
+                    <p>{{text}}<p>
+                </div>
+
+            </li>
+        </script> <!-- mustashe template generate messages  -->
+
+
+        <script id="location-message-template" type="text/template">
+            <li class="message">
+
+                <div class="message__title">
+                    <h4>{{from}}</h4>
+                    <span>{{createAt}}</span>
+                </div>
+
+                <div class="message__body">
+                    <a href="{{url}}" target="_blank">My current location</a>
+                </div>
+                    
+            </li>
+        </script> <!-- mustashe template generate location messages  -->
+
+
+        <script src="/socket.io/socket.io.js">//socketIo Javascript library (io())</script>
+        <script src="/js/libs/jquery-3.2.1.min.js"></script>
+        <script src="/js/libs/moment.js">//moments library</script>
+        <script src="/js/libs/mustache.js">//mustash.js library </script>
+        <script src="/js/chat.js">//Injecting my Javascript Code</script>
+    </body>
+</html>

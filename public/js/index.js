@@ -17,34 +17,29 @@ socket.on('disconnect', function () {
 // listener - geolocation event
 socket.on('newLocationMessage', function (location) {
     var formattedTime = moment(location.createAt).format('h:mm a');
-    var li = jQuery('<li></li>');
-        // when you set anchor tag(<a>) - target="_blank", browser will create a new tab 
-    var a = jQuery('<a target="_blank">My current location</a>')
-        // set text in li 
-    li.text(`${location.from} ${formattedTime}: `);
-        // set attributes of a tags
-            // set href - to url 
-    a.attr('href', location.url)
+    var template = jQuery('#location-message-template').html();
+    var html = Mustache.render(template, {
+        url: location.url,
+        from: location.from,
+        createAt: formattedTime
+    });
 
-    // append anchor tag (note - anchor tag normally sits within other tags)
-    li.append(a);
-    console.log(`this is the anchor tag: ${li}` );
-    
-    // 
-    jQuery('#messages').append(li);
+    jQuery('#messages').append(html);
 });
 
-// Listener - will catch the broadcasted massage from server & render it to client using jQuery - 3rd stage in process
-socket.on('newMessage', (message, callback) => { 
+// Listener - will catch the broadcasted massage from server & render it to client using mustache - 3rd stage in process
+socket.on('newMessage', function (message) { 
     var formattedTime = moment(message.createAt).format('h:mm a');
-    console.log('newMessage', message);
-        // use jQuery to create lists element
-    var li = jQuery('<li></li>');
-        // set li text
-    li.text(` ${message.from} ${formattedTime}: ${message.text}`);
-    
-        // append - li variable to the DOM (add to last child (last place))
-    jQuery('#messages').append(li);
+    // - .html() method will return the markup within the '#message-template' - which is the p tags
+    var template = jQuery('#message-template').html();
+    // - mustache, takes template you want to render
+    var html = Mustache.render(template, {
+        text: message.text,
+        from: message.from,
+        createAt: formattedTime
+    });
+
+    jQuery('#messages').append(html);
 });       
 
 
@@ -107,6 +102,38 @@ locationButton.on('click', function(e) {
 })
 
 
+/// old code - changed code from jQuery injection to mustache.js templates #lecture 118
+    //     // Listener - will catch the broadcasted massage from server & render it to client using jQuery - 3rd stage in process
+    // socket.on('newMessage', (message, callback) => { 
+    //     var formattedTime = moment(message.createAt).format('h:mm a');
+    //     console.log('newMessage', message);
+    //         // use jQuery to create lists element
+    //     var li = jQuery('<li></li>');
+    //         // set li text
+    //     li.text(` ${message.from} ${formattedTime}: ${message.text}`);
+        
+    //         // append - li variable to the DOM (add to last child (last place))
+    //     jQuery('#messages').append(li);
+    // });      
+    // listener - geolocation event
+    // socket.on('newLocationMessage', function (location) {
+    //     var formattedTime = moment(location.createAt).format('h:mm a');
+    //     var li = jQuery('<li></li>');
+    //         // when you set anchor tag(<a>) - target="_blank", browser will create a new tab 
+    //     var a = jQuery('<a target="_blank">My current location</a>')
+    //         // set text in li 
+    //     li.text(`${location.from} ${formattedTime}: `);
+    //         // set attributes of a tags
+    //             // set href - to url 
+    //     a.attr('href', location.url)
+
+    //     // append anchor tag (note - anchor tag normally sits within other tags)
+    //     li.append(a);
+    //     console.log(`this is the anchor tag: ${li}` );
+        
+    //     // 
+    //     jQuery('#messages').append(li);
+    // });
 /// old code - changed both jQuery requests to allow for removing text from text - disabling send location to prevent spam #lecture115
   //// jQuery event - on Submit from button - will return function - e
     // first stage in process - client will create a message (emitter) & send to server, server will broadcast & then client will listen & render to screen at stage 3

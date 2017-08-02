@@ -4,7 +4,7 @@
 // io() - opens connection  #Access given by SocketIO javascript library <script injection>
 var socket = io();     
 
-// scrolling
+// auto scrolling function
 function scrollToBottom() {
     //Selectors
         var messages = jQuery('#messages'); //select all elements with id = #messages
@@ -23,9 +23,25 @@ function scrollToBottom() {
     };
 };
 
-// connect event for client to server
+// listener for connection even (connect to connection on server) #note - Main connection method for client & server, happens first
 socket.on('connect', function () {
-    console.log('connected to server');
+        //note - location is a DOM option - we will use it to return the search query in the url
+    var params = jQuery.deparam(window.location.search);
+    /// connect event for client to server #transfer search result
+        //# using window.location.search, from the url result of joining a room - we will emit this to server to ensure we only broadcast to room
+        //# note - params is an object! - which is wat we normally pass
+    socket.emit('join', params, function (err) {
+        //acknowledgement callback
+        if (err) {
+            // if error is return by acknowledgement that room or name are invalid
+                // return used back to index.html (root)
+            alert(err); // note - err msg is the string we passed on listener
+            window.location.href = '/';
+        }else{
+            console.log('No err fam');
+        }
+    }) 
+    
 });
 
 // disconnect even for client to server

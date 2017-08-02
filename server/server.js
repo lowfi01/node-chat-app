@@ -6,6 +6,7 @@ const socketIO = require('socket.io');
 
 
 const {generateMessage, generateLocationMessage} = require('./utils/message');
+const {isRealString} = require('./utils/validation');
 // using path - to make routing to path easier
 const publicPath = path.join(__dirname, '../public');
 // heroku requirement
@@ -36,14 +37,46 @@ io.on('connection', (socket) => { // - Returns socket, which we can manipulate
         //#  listeners - are used to receive data from emitter & then do something to data              
 
     // Large comment block - notes # emitters & listeners
-    
 
-        // viewable only to client opening a connection
-    socket.emit('newMessage', generateMessage('Admin', 'Welcome to chat application'));
+    //listener for join 
+    socket.on('join', (params, callback) => {
+        //create validation to prevent empty strings
+        if(!isRealString(params.name) || !isRealString(params.room)) {
+            // if neither pass validation return error to callBack acknowledgement
+            callback('Name and room name are required.');
+        } 
 
-        // viewable to everyone but the client who has just opened a new connection
-    socket.broadcast.emit('newMessage', generateMessage('Admin', 'New user joined'));
-    
+        // joining socket.io room
+            // arguments socket.join('roomName')
+        socket.join(params.room.toLowerCase());
+
+
+        // review socket methods
+            // io.on // create a new socket connection - #'connection' - client side 'connect'
+            // io.emit // create an emit event to all connected users
+            // socket.broadcast.emit // send to all expect for current user(sender)
+            // socket.emit // emittes event specifically to one user
+
+           // room counterpart methods
+               // io.on // create a new socket connection
+               // io.emit -> io.to('roomName').emit // emittes to all users in room
+               // socket.broadcast.emit -> socket.broadcast.to('roomName').emit // same as above, but to room
+               // socket.emit -> 
+//        
+  
+//note - moved emit & broadcast to join
+            // viewable only to client opening a connection
+        socket.emit('newMessage', generateMessage('Admin', 'Welcome to chat application'));
+
+            // viewable to everyone but the client who has just opened a new connection
+        socket.broadcast.to(params.room.toLowerCase()).emit('newMessage', generateMessage('Admin', `${params.name} has joined.`));
+
+
+        // if no error - return callback empty
+        callback();
+
+
+    });
     
     //# note - this will catch the message send from the form data & emit it to everyone - second Stage in process
         //#acknowledgment - add second argument callback
@@ -54,6 +87,8 @@ io.on('connection', (socket) => { // - Returns socket, which we can manipulate
             // this will return the event to the emitter (in this case the client)
         callback('');
     });  
+
+
 
     // listen for createLocationMessage event & broadcast to all
         // pass through generateMessageObject
@@ -72,6 +107,13 @@ server.listen(port, () => {
     console.log(`server is live on ${port}`);
 });
 
+
+/// old code - moved socket.emit & socket.broadcast to 'join' also edited code #122
+    //         // viewable only to client opening a connection
+    // socket.emit('newMessage', generateMessage('Admin', 'Welcome to chat application'));
+
+    //     // viewable to everyone but the client who has just opened a new connection
+    // socket.broadcast.emit('newMessage', generateMessage('Admin', 'New user joined'));
 
 /// old code - reformat listener to emit newLocationMessage rather then message #lecture 114
 /// old code - reformated listener to use acknowledgements #lecture 111

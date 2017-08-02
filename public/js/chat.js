@@ -4,6 +4,7 @@
 // io() - opens connection  #Access given by SocketIO javascript library <script injection>
 var socket = io();     
 
+
 // auto scrolling function
 function scrollToBottom() {
     //Selectors
@@ -38,7 +39,7 @@ socket.on('connect', function () {
             alert(err); // note - err msg is the string we passed on listener
             window.location.href = '/';
         }else{
-            console.log('No err fam');
+            //console.log('params passed', params);
         }
     }) 
     
@@ -48,6 +49,19 @@ socket.on('connect', function () {
 socket.on('disconnect', function () {
     console.log('disconnected from server');
 });
+
+socket.on('updateUserList', function (users) {
+    var ol = jQuery('<ol></ol>');
+
+    users.forEach(function(user) {
+        // iterate over all the users
+        ol.append(jQuery('<li></li>').text(user));
+    });
+
+    // append will only update, while .html will create a new list
+    jQuery('#users').html(ol);
+    //console.log('hello this emit is working', users);
+})
 
 // listener - geolocation event
 socket.on('newLocationMessage', function (location) {

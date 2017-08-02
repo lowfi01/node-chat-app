@@ -5,8 +5,11 @@ const express = require('express');
 const socketIO = require('socket.io');
 
 
+
 const {generateMessage, generateLocationMessage} = require('./utils/message');
 const {isRealString} = require('./utils/validation');
+// require - class
+const {Users} = require('./utils/users');
 // using path - to make routing to path easier
 const publicPath = path.join(__dirname, '../public');
 // heroku requirement
@@ -20,6 +23,8 @@ var io = socketIO(server);
     // express middleware - making /public viewable to express to serve-up
 app.use(express.static(publicPath));
 
+//users instance - 
+var users = new Users();
 
 //  #register instance of event listener  - io.on('connection', callBack)
     //  #connection - listens for a new connection  
@@ -38,41 +43,26 @@ io.on('connection', (socket) => { // - Returns socket, which we can manipulate
 
     // Large comment block - notes # emitters & listeners
 
-    //listener for join 
+//listener for join 
     socket.on('join', (params, callback) => {
-        //create validation to prevent empty strings
         if(!isRealString(params.name) || !isRealString(params.room)) {
-            // if neither pass validation return error to callBack acknowledgement
-            callback('Name and room name are required.');
-        } 
+            return callback('Name and room name are required.');
+        };
 
-        // joining socket.io room
-            // arguments socket.join('roomName')
-        socket.join(params.room.toLowerCase());
+        // added variable to prevent upper & lower case errors
+            // this was happening due to the fact i was converting the join room to lowercase & broadcasting to upper
+        var room = params.room.toLowerCase();
+        socket.join(room);
+        users.removeUser(socket.id);
+        //console.log('list of users pre add', users.users)
+        users.addUser(socket.id, params.name, room);
+        //console.log('list of users post add ', users.users)
 
-
-        // review socket methods
-            // io.on // create a new socket connection - #'connection' - client side 'connect'
-            // io.emit // create an emit event to all connected users
-            // socket.broadcast.emit // send to all expect for current user(sender)
-            // socket.emit // emittes event specifically to one user
-
-           // room counterpart methods
-               // io.on // create a new socket connection
-               // io.emit -> io.to('roomName').emit // emittes to all users in room
-               // socket.broadcast.emit -> socket.broadcast.to('roomName').emit // same as above, but to room
-               // socket.emit -> 
-//        
-  
-//note - moved emit & broadcast to join
-            // viewable only to client opening a connection
+        //console.log('get user list call', users.getUserList(room));
+        //hello;
+        io.to(room).emit('updateUserList', users.getUserList(room));
         socket.emit('newMessage', generateMessage('Admin', 'Welcome to chat application'));
-
-            // viewable to everyone but the client who has just opened a new connection
         socket.broadcast.to(params.room.toLowerCase()).emit('newMessage', generateMessage('Admin', `${params.name} has joined.`));
-
-
-        // if no error - return callback empty
         callback();
 
 
@@ -98,6 +88,14 @@ io.on('connection', (socket) => { // - Returns socket, which we can manipulate
 
     // disconnect even for server to client(browser or tabs)
     socket.on('disconnect', () => {
+        var user = users.removeUser(socket.id);
+
+        // if user was successfully removed
+            // return event from removeUser is the user - if unsuccessful variable will be undefined
+        if (user) {
+            io.to(user.room).emit('updateUserList', users.getUserList(user.room));
+            io.to(user.room).emit('newMessage', generateMessage('Admin', `${user.name} has left the room`));
+        }
         console.log('disconnected from client');
     });
 });
@@ -108,6 +106,54 @@ server.listen(port, () => {
 });
 
 
+/// old code - moved code to comment to clean up code #lecture 125
+    // //listener for join 
+    // socket.on('join', (params, callback) => {
+    //     //create validation to prevent empty strings
+    //     if(!isRealString(params.name) || !isRealString(params.room)) {
+    //         // if neither pass validation return error to callBack acknowledgement
+    //         return callback('Name and room name are required.');
+    //     }; // note - if true - callback will fire and nothing below will run
+
+    //     // joining socket.io room
+    //         // arguments socket.join('roomName')
+    //     socket.join(params.room.toLowerCase());
+
+    //     //prevent duplicate users
+    //     users.removeUser(socket.id);
+
+
+    //     // review socket methods
+    //         // io.on // create a new socket connection - #'connection' - client side 'connect'
+    //         // io.emit // create an emit event to all connected users
+    //         // socket.broadcast.emit // send to all expect for current user(sender)
+    //         // socket.emit // emittes event specifically to one user
+
+    //        // room counterpart methods
+    //            // io.on // create a new socket connection
+    //            // io.emit -> io.to('roomName').emit // emittes to all users in room
+    //            // socket.broadcast.emit -> socket.broadcast.to('roomName').emit // same as above, but to room
+    //            // socket.emit -> 
+
+    //     //add user to array        
+    //            // note - addUser requires (id, name, room)
+    //     users.addUser(socket.id, params.name, params.room);
+
+    //     //emit - list of users - when new users joins room
+    //     io.to('LOTR').emit('updateUserList', users.getUserList(params.room));
+        
+    //     // viewable only to client opening a connection
+    //     socket.emit('newMessage', generateMessage('Admin', 'Welcome to chat application'));
+
+    //         // viewable to everyone but the client who has just opened a new connection
+    //     socket.broadcast.to(params.room.toLowerCase()).emit('newMessage', generateMessage('Admin', `${params.name} has joined.`));
+
+
+    //     // if no error - return callback empty
+    //     callback();
+
+
+    // });
 /// old code - moved socket.emit & socket.broadcast to 'join' also edited code #122
     //         // viewable only to client opening a connection
     // socket.emit('newMessage', generateMessage('Admin', 'Welcome to chat application'));

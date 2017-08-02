@@ -41,7 +41,7 @@ class Users{
             });
         }
 
-        console.log('USER',  user)
+        //console.log('USER',  user)
         // regardless of result we still want to return user - defined or undefined
         return user;
 

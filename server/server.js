@@ -71,10 +71,17 @@ io.on('connection', (socket) => { // - Returns socket, which we can manipulate
     //# note - this will catch the message send from the form data & emit it to everyone - second Stage in process
         //#acknowledgment - add second argument callback
     socket.on('createMessage', (message, callback) => { 
-        console.log('createMessage', message);
-            //broadcast to all
-        io.emit('newMessage', generateMessage(message.from, message.text));
-            // this will return the event to the emitter (in this case the client)
+            // get used from Users class
+            var user = users.getUser(socket.id);
+
+            // validate user is real & string is not empty
+            if (users && isRealString(message.text)) {
+                var name = user.name;
+                // send to room only
+                io.to(user.room).emit('newMessage', generateMessage(name, message.text));
+            }
+
+        
         callback('');
     });  
 
@@ -83,7 +90,10 @@ io.on('connection', (socket) => { // - Returns socket, which we can manipulate
     // listen for createLocationMessage event & broadcast to all
         // pass through generateMessageObject
     socket.on('createLocationMessage', (coordinates) => {
-        io.emit('newLocationMessage', generateLocationMessage('Admin', coordinates.latitude, coordinates.longitude))
+        var user = users.getUser(socket.id);
+        if (user) {
+            io.to(user.room).emit('newLocationMessage', generateLocationMessage(user.name, coordinates.latitude, coordinates.longitude))
+        };
     });
 
     // disconnect even for server to client(browser or tabs)
@@ -105,7 +115,38 @@ server.listen(port, () => {
     console.log(`server is live on ${port}`);
 });
 
+/// old code - final update - send msgs to specific room & change from message #lecture 126
+    //         //# note - this will catch the message send from the form data & emit it to everyone - second Stage in process
+    //         //#acknowledgment - add second argument callback
+    //     socket.on('createMessage', (message, callback) => { 
+    //         console.log('createMessage', message);
+    //             //broadcast to all
+    //         io.emit('newMessage', generateMessage(message.from, message.text));
+    //             // this will return the event to the emitter (in this case the client)
+    //         callback('');
+    //     });  
 
+
+
+    //     // listen for createLocationMessage event & broadcast to all
+    //         // pass through generateMessageObject
+    //     socket.on('createLocationMessage', (coordinates) => {
+    //         io.emit('newLocationMessage', generateLocationMessage('Admin', coordinates.latitude, coordinates.longitude))
+    //     });
+
+    //     // disconnect even for server to client(browser or tabs)
+    //     socket.on('disconnect', () => {
+    //         var user = users.removeUser(socket.id);
+
+    //         // if user was successfully removed
+    //             // return event from removeUser is the user - if unsuccessful variable will be undefined
+    //         if (user) {
+    //             io.to(user.room).emit('updateUserList', users.getUserList(user.room));
+    //             io.to(user.room).emit('newMessage', generateMessage('Admin', `${user.name} has left the room`));
+    //         }
+    //         console.log('disconnected from client');
+    //     });
+    // });
 /// old code - moved code to comment to clean up code #lecture 125
     // //listener for join 
     // socket.on('join', (params, callback) => {

@@ -94,23 +94,14 @@ socket.on('newMessage', function (message) {
 });       
 
 
-// jQuery event - on Submit from button - will return function - e
-    // first stage in process - client will create a message (emitter) & send to server, server will broadcast & then client will listen & render to screen at stage 3
 jQuery('#message-form').on('submit', function (e) {
-        // manipulate e - to prevent default behavior
     e.preventDefault();
 
-        // note - [name=value] - this is a method to select name attributes from html
     var messageTextBox = jQuery('[name=message]')
 
-        // emit createMessage event with the data send from the form
     socket.emit('createMessage', {
-        from: 'User',
-            // use selector to grab text field from forms
         text: messageTextBox.val()
     }, function (data) {// callBack to acknowledgement
-            // select text box via name attribute & clear the text with empty string
-                // #note - this is a callback acknowledgement, as it is post the emit request, we can clear the text field after submit button has been called  
         messageTextBox.val(' ');
     });
 });
@@ -152,6 +143,28 @@ locationButton.on('click', function(e) {
     });
 })
 
+
+/// old code - final update - send msgs to specific room & change from message #lecture 126
+    // jQuery event - on Submit from button - will return function - e
+    //     // first stage in process - client will create a message (emitter) & send to server, server will broadcast & then client will listen & render to screen at stage 3
+    // jQuery('#message-form').on('submit', function (e) {
+    //         // manipulate e - to prevent default behavior
+    //     e.preventDefault();
+
+    //         // note - [name=value] - this is a method to select name attributes from html
+    //     var messageTextBox = jQuery('[name=message]')
+
+    //         // emit createMessage event with the data send from the form
+    //     socket.emit('createMessage', {
+    //         from: 'User',
+    //             // use selector to grab text field from forms
+    //         text: messageTextBox.val()
+    //     }, function (data) {// callBack to acknowledgement
+    //             // select text box via name attribute & clear the text with empty string
+    //                 // #note - this is a callback acknowledgement, as it is post the emit request, we can clear the text field after submit button has been called  
+    //         messageTextBox.val(' ');
+    //     });
+    // });
 
 /// old code - changed code from jQuery injection to mustache.js templates #lecture 118
     //     // Listener - will catch the broadcasted massage from server & render it to client using jQuery - 3rd stage in process
